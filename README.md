@@ -1,4 +1,4 @@
-# 🛍️ Store Chatbot API
+# 🛍️ Shop_Assistant Chatbot API
 
 A fully functional **AI-powered product chatbot REST API** built with **FastAPI**, integrated with **Groq’s Llama 3 LLM**, and connected to **DummyJSON Products API**.  
 It provides human-like conversational responses about products — prices, categories, stock, and more.
@@ -35,7 +35,7 @@ Build an intelligent **chatbot backend** that:
 
 ## 📁 Project Structure
 ```
-server/
+Shop_Assistant/
  ├── app/
  │    ├── api/
  │    │    └── routes_chatbot.py
@@ -66,8 +66,8 @@ server/
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/niloysannyal/Store_Chatbot.git
-cd Store_Chatbot/
+git clone https://github.com/niloysannyal/Shop_Assistant.git
+cd Shop_Assistant/
 ```
 ### 2️⃣ Create a Virtual Environment
 ```
