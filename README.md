@@ -1,97 +1,179 @@
-# Product Chatbot API 🤖
+# 🛍️ Store Chatbot API
 
-## Project Overview
-This project is a RESTful Chatbot API built with FastAPI. It interacts with customers and provides human-like answers about product details using data from the [DummyJSON Products API](https://dummyjson.com/products) and Groq LLM API.
+A fully functional **AI-powered product chatbot REST API** built with **FastAPI**, integrated with **Groq’s Llama 3 LLM**, and connected to **DummyJSON Products API**.  
+It provides human-like conversational responses about products — prices, categories, stock, and more.
 
-## Features
-- Fetch all products: `GET /api/products`
-- Chatbot endpoint: `POST /api/chat`
-- AI-powered responses using Groq LLM
-- Context-aware product information
-- Modular FastAPI structure
+---
 
-## File Structure
+## 🚀 Project Overview
+
+### 🎯 Goal
+Build an intelligent **chatbot backend** that:
+- Responds naturally to customer queries about products.
+- Retrieves real product data from [DummyJSON Products API](https://dummyjson.com/products).
+- Uses **Groq LLM (Llama 3.3 70B Versatile)** for context-aware responses.
+- Supports conversational product queries like:
+  - “What’s the price of Kiwi?”
+  - “Do you have any groceries?”
+  - “Show me products with ratings above 4.”
+  - “Tell me more about Kiwi.”
+
+---
+
+## 🧩 Tech Stack
+
+| Component        | Technology Used |
+|------------------|-----------------|
+| **Backend**      | FastAPI (Python 3.11+) |
+| **AI Model**     | Groq LLM (Llama 3.3 70B Versatile) |
+| **Data Source**  | DummyJSON API |
+| **Frontend**     | React + TailwindCSS |
+| **Testing**      | Pytest / Requests |
+| **Environment**  | `.env` configuration with Pydantic |
+
+---
+
+## 📁 Project Structure
 ```
 server/
-├── app/
-│ ├── api/
-│ │ ├── routes_chatbot.py
-│ ├── core/
-│ │ ├── config.py
-│ ├── services/
-│ │ ├── chatbot_service.py
-│ │ ├── product_service.py
-│ ├── main.py
-│ ├── models/
-│ │ ├── schemas.py
-│ ├── utils/
-│ │ ├── groq_client.py
-├── requirements.txt
-├── README.md
+ ├── app/
+ │    ├── api/
+ │    │    └── routes_chatbot.py
+ │    ├── core/
+ │    │    └── config.py
+ │    ├── services/
+ │    │    ├── chatbot_service.py
+ │    │    └── product_service.py
+ │    ├── models/
+ │    │    └── schemas.py
+ │    ├── utils/
+ │    │    └── groq_client.py
+ │    └── main.py
+ ├── frontend
+ |    ├── index.html
+ ├── .env
+ ├── .gitignore
+ ├── test.py
+ ├── README.md
+ └── requirements.txt
 ```
 
 
-## Setup Instructions
+---
 
-1. **Clone the repository**
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone the Repository
+
 ```bash
-git clone https://github.com/<username>/Product_Chatbot_API.git
-cd Product_Chatbot_API/server
+git clone https://github.com/niloysannyal/Store_Chatbot.git
+cd Store_Chatbot/
 ```
-2. Create virtual environment
+### 2️⃣ Create a Virtual Environment
 ```
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
+source venv/bin/activate       # On macOS/Linux
+venv\Scripts\activate          # On Windows
 ```
-3. Install dependencies
+### 3️⃣ Install Dependencies
 ```
 pip install -r requirements.txt
 ```
-4. Set Groq API key
+### 4️⃣ Configure Environment Variables
 ```
-export GROQ_API_KEY="your_groq_api_key"   # Linux/Mac
-set GROQ_API_KEY="your_groq_api_key"      # Windows
+GROQ_API_KEY="your_groq_api_key"
+GROQ_API_URL=https://api.groq.com/openai/v1/chat/completions
+GROQ_MODEL="llama-3.3-70b-versatile"
+DUMMYJSON_URL=https://dummyjson.com/products
+HOST="0.0.0.0"
+PORT=8000
 ```
-5. Run the FastAPI server
+### 5️⃣ Run the API
 ```
 uvicorn app.main:app --reload
 ```
-6. Access API docs
-Open http://localhost:8000/docs
+🌐 **Visit the docs at:** http://localhost:8000/docs
 
+## 💬 API Endpoints
+### 🔹 GET /api/products
+**Fetch and return all product data from DummyJSON.**
 
-## API Endpoints
-- GET /api/products
+**Response Example:**
+```
+{
+    "id": 18,
+    "title": "Cat Food",
+    "description": "Nutritious cat food formulated to meet the dietary needs of your feline friend.",
+    "price": 8.99,
+    "discountPercentage": 9.58,
+    "rating": 3.13,
+    "stock": 46,
+    "brand": null,
+    "category": "groceries",
+    "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/cat-food/thumbnail.webp"
+}
+```
+### 🔹 POST /api/chat
+**Accepts a user message and returns a natural-language AI-generated response.**
 
-Fetches all products from DummyJSON.
-
-- POST /api/chat
-
-Sends a customer message and receives an AI-generated response.
-
-Request Example
+**Request Example:**
 ```
 {
   "message": "Tell me more about Kiwi"
 }
 ```
-Response Example
+**Response Example:**
 ```
 {
   "response": "Kiwi is a nutrient-rich fruit priced at $2.49, rated 4.9 stars by our customers. It ships overnight and comes with a 6-month warranty."
 }
 ```
 
-## License
+## 🧠 Chatbot Logic (RAG-Style)
+**The chatbot uses a Retrieve-and-Generate approach:**
+1. Intent Recognition → Understands user query using regex + NLP.
+2. Product Retrieval → Searches DummyJSON for relevant products.
+3. Fact Formatting → Extracts key details like name, price, stock, discount.
+4. Response Generation → Uses Groq LLM for conversational phrasing.
 
-MIT License
+### 🪄 Example Interactions
+| User Message                     | Chatbot Response                          |
+| -------------------------------- | ----------------------------------------- |
+| “Hi”                             | Hello! 👋 How can I help you today?       |
+| “Do you have groceries?”         | Lists products in the groceries category. |
+| “Show me products under $10”     | Displays matching items below $10.        |
+| “Is Kiwi in stock?”              | Reports real-time stock info.             |
+| “What categories are available?” | Lists available categories.               |
+
+## ✅ Testing
+**To validate the chatbot and product endpoints, run:**
+```
+python test.py
+```
+🧪 Sample Output:
+```
+Chat tests passed: 11, failed: 0
+ALL OK
+```
+
+## 🧱 Key Highlights
+✅ **Modular FastAPI architecture**  
+✅ **Real-time product data** from DummyJSON API  
+✅ **Context-aware Groq LLM** responses  
+✅ **Cached and efficient** product fetching  
+✅ **Natural, context-driven** query understanding  
+✅ **Friendly conversational tone**  
+✅ **Beautifully responsive** React + Tailwind UI  
+✅ **Animated gradients and smooth** chat experience  
 
 
-## Author
+## 🧑‍💻 Author
 
-Name: Niloy Sannyal
+👤 **Niloy Sannyal**  
+💌 **Email:** [niloysannyal@gmail.com](mailto:Niloysannyal@gmail.com)    
+🐙 **GitHub:** [github/niloysannyal](https://github.com/niloysannyal)  
+💼 **LinkedIn:** [linkedin.com/in/niloysannyal](https://linkedin.com/in/niloysannyal)
 
-Email: niloysannyal@gmail.com
 
-GitHub: https://github.com/niloysannyal
+## 🪪 License
+This project is licensed under the MIT License — free to use and modify.
