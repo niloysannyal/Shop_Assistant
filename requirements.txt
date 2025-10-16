@@ -1,5 +1,9 @@
 fastapi
 uvicorn
+requests
 pydantic
 pydantic-settings
-requests
+httpx
+python-dotenv
+groq
+
