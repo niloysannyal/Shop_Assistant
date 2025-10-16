@@ -80,6 +80,8 @@ venv\Scripts\activate          # On Windows
 pip install -r requirements.txt
 ```
 ### 4️⃣ Configure Environment Variables
+**create a .env file in the root folder and paste these variables in it.**    
+**Replace "your_groq_api_key" with your groq api key**
 ```
 GROQ_API_KEY="your_groq_api_key"
 GROQ_API_URL=https://api.groq.com/openai/v1/chat/completions
