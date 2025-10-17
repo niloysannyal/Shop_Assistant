@@ -1,336 +1,735 @@
-import { useState, useRef, useEffect } from 'react';
-import { Send, ShoppingBag, Loader, Github, Linkedin, Mail, Sparkles, ArrowRight, MessageCircle, Zap } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-export default function ShopAssistant() {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "Hey there! 👋 Welcome to Shop Assistant. I'm here to help you find amazing products, discover great deals, and answer any shopping questions. What are you looking for today?",
-      sender: 'bot',
-      timestamp: new Date()
-    }
-  ]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const messagesEndRef = useRef(null);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 25%;
+            width: 384px;
+            height: 384px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            filter: blur(96px);
+            animation: pulse 4s ease-in-out infinite;
+            pointer-events: none;
+        }
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+        body::after {
+            content: '';
+            position: fixed;
+            top: 33%;
+            right: 0;
+            width: 384px;
+            height: 384px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 9999px;
+            filter: blur(96px);
+            animation: pulse 4s ease-in-out infinite 1s;
+            pointer-events: none;
+        }
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || loading) return;
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
 
-    const userMessage = {
-      id: messages.length + 1,
-      text: input,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    const userInput = input;
-    setInput('');
-    setLoading(true);
-
-    try {
-      const response = await fetch('http://localhost:8000/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: userInput })
-      });
-
-      if (!response.ok) throw new Error('Failed to get response');
-
-      const data = await response.json();
-
-      const botMessage = {
-        id: messages.length + 2,
-        text: data.response || data.message,
-        sender: 'bot',
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      const errorMessage = {
-        id: messages.length + 2,
-        text: "Oops! Something went wrong. Please try again in a moment.",
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const suggestedQueries = [
-    "Find me wireless headphones",
-    "What are trending products?",
-    "Show me budget gadgets"
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 flex flex-col p-4 md:p-6">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/3 right-0 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-      </div>
-
-      <div className="flex-1 flex items-center justify-center max-w-6xl mx-auto w-full">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 h-[700px] relative z-10">
-          
-          {/* Main Chat Container */}
-          <div className="lg:col-span-2 flex flex-col">
-            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-t-3xl p-6 shadow-2xl border border-blue-500/20">
-              <div className="flex items-center gap-4">
-                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-md border border-white/10">
-                  <ShoppingBag className="w-7 h-7 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-white">Shop Assistant</h1>
-                  <p className="text-blue-100 text-sm flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" />
-                    Your AI shopping companion
-                  </p>
-                </div>
-                <div className="hidden md:flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/20">
-                  <Zap className="w-4 h-4 text-yellow-300" />
-                  <span className="text-white text-xs font-medium">Powered by Groq</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto bg-slate-800/40 backdrop-blur-xl px-6 py-6 space-y-4 border-x border-blue-500/10 custom-scrollbar">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
-                >
-                  <div
-                    className={`max-w-sm px-5 py-4 rounded-2xl backdrop-blur-sm transition-all duration-200 ${
-                      msg.sender === 'user'
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-none shadow-lg hover:shadow-blue-500/50'
-                        : 'bg-slate-700/50 text-slate-100 rounded-bl-none border border-slate-600/50 hover:border-slate-500/50'
-                    }`}
-                  >
-                    <p className="text-sm leading-relaxed">{msg.text}</p>
-                    <span
-                      className={`text-xs mt-3 block font-medium ${
-                        msg.sender === 'user' ? 'text-blue-100' : 'text-slate-400'
-                      }`}
-                    >
-                      {msg.timestamp.toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  </div>
-                </div>
-              ))}
-
-              {loading && (
-                <div className="flex justify-start animate-fadeIn">
-                  <div className="bg-slate-700/50 border border-slate-600/50 px-5 py-4 rounded-2xl rounded-bl-none backdrop-blur-sm">
-                    <div className="flex gap-2 items-center">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                      </div>
-                      <span className="text-sm text-slate-300">Shop Assistant is thinking...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <div className="bg-gradient-to-b from-slate-800/60 to-slate-900/40 backdrop-blur-xl p-5 rounded-b-3xl border-x border-b border-blue-500/10 shadow-2xl">
-              <div className={`flex gap-3 mb-3 transition-all duration-300 ${isFocused ? 'scale-105' : 'scale-100'}`}>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                  placeholder="Ask about products, deals, recommendations..."
-                  disabled={loading}
-                  className="flex-1 bg-slate-700/60 border border-slate-600 text-white placeholder-slate-400 rounded-full px-5 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition disabled:opacity-50 backdrop-blur-sm"
-                />
-                <button
-                  onClick={handleSendMessage}
-                  disabled={loading || !input.trim()}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-slate-600 disabled:to-slate-600 text-white p-3 rounded-full transition transform hover:scale-110 active:scale-95 shadow-lg disabled:shadow-none border border-blue-400/30"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-xs text-slate-500 text-center">
-                Press Enter to send • Shift+Enter for new line
-              </p>
-            </div>
-          </div>
-
-          {/* Sidebar - Quick Actions */}
-          <div className="hidden lg:flex flex-col gap-4">
-            {/* Info Card */}
-            <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/40 backdrop-blur-xl rounded-2xl p-5 border border-blue-500/10 shadow-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <MessageCircle className="w-5 h-5 text-blue-400" />
-                <h3 className="text-white font-semibold">Quick Tips</h3>
-              </div>
-              <ul className="space-y-3 text-sm text-slate-300">
-                <li className="flex gap-2">
-                  <ArrowRight className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span>Ask for product recommendations</span>
-                </li>
-                <li className="flex gap-2">
-                  <ArrowRight className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span>Compare prices and features</span>
-                </li>
-                <li className="flex gap-2">
-                  <ArrowRight className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span>Find deals and discounts</span>
-                </li>
-                <li className="flex gap-2">
-                  <ArrowRight className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                  <span>Get instant product information</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Suggested Queries */}
-            <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/40 backdrop-blur-xl rounded-2xl p-5 border border-purple-500/10 shadow-xl">
-              <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-400" />
-                Try asking
-              </h3>
-              <div className="space-y-2">
-                {suggestedQueries.map((query, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setInput(query);
-                    }}
-                    className="w-full text-left bg-slate-700/40 hover:bg-slate-700/70 text-slate-300 hover:text-white text-sm px-4 py-3 rounded-lg border border-slate-600/50 transition-all duration-200 hover:border-purple-500/30 group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="group-hover:translate-x-1 transition-transform">{query}</span>
-                      <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="mt-8 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-slate-800/40 backdrop-blur-xl border border-blue-500/10 rounded-2xl px-6 py-5 shadow-xl">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-center md:text-left">
-                <p className="text-slate-400 text-sm">Developed with ❤️ by</p>
-                <p className="text-white font-bold text-lg">Niloy Sannyal</p>
-              </div>
-              
-              <div className="flex items-center gap-6">
-                <a
-                  href="mailto:Niloysannyal@gmail.com"
-                  className="text-slate-400 hover:text-blue-400 transition-colors duration-200 hover:scale-110"
-                  title="Email"
-                >
-                  <Mail className="w-6 h-6" />
-                </a>
-                <a
-                  href="https://github.com/niloysannyal"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-blue-400 transition-colors duration-200 hover:scale-110"
-                  title="GitHub"
-                >
-                  <Github className="w-6 h-6" />
-                </a>
-                <a
-                  href="https://linkedin.com/in/niloysannyal"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-blue-400 transition-colors duration-200 hover:scale-110"
-                  title="LinkedIn"
-                >
-                  <Linkedin className="w-6 h-6" />
-                </a>
-              </div>
-
-              <div className="text-center md:text-right text-slate-400 text-xs space-y-1">
-                <p>© 2025 Shop Assistant</p>
-                <p className="flex items-center gap-2 justify-center md:justify-end">
-                  <Zap className="w-3 h-3" /> Powered by Groq LLM
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      <style jsx>{`
         @keyframes fadeIn {
-          from {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            width: 100%;
+            height: 700px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(20px);
+        }
+
+        .header {
+            background: linear-gradient(90deg, #2563eb, #9333ea, #ec4899);
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-icon i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .header-text h1 {
+            color: white;
+            font-size: 1.875rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .header-text p {
+            color: rgba(191, 219, 254, 1);
+            font-size: 0.875rem;
+            margin: 0.25rem 0 0 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-badge {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-left: auto;
+        }
+
+        @media (min-width: 768px) {
+            .header-badge {
+                display: flex;
+            }
+        }
+
+        .header-badge span {
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(59, 130, 246, 0.1);
+            border-right: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.4);
+            border-radius: 3px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.6);
+        }
+
+        .message {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #2563eb, #9333ea);
+            color: white;
+            border-bottom-right-radius: 0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .message.user .message-bubble:hover {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .message.bot .message-bubble {
+            background: rgba(71, 85, 105, 0.5);
+            color: rgba(226, 232, 240, 1);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-bottom-left-radius: 0;
+        }
+
+        .message.bot .message-bubble:hover {
+            border-color: rgba(71, 85, 105, 0.8);
+        }
+
+        .message-text {
+            font-size: 0.875rem;
+            line-height: 1.625;
+            margin: 0;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            margin-top: 0.75rem;
+            display: block;
+            font-weight: 500;
+        }
+
+        .message.user .message-time {
+            color: rgba(191, 219, 254, 1);
+        }
+
+        .message.bot .message-time {
+            color: rgba(148, 163, 184, 1);
+        }
+
+        .loading {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(96, 165, 250, 1);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .loading-text {
+            font-size: 0.875rem;
+            color: rgba(203, 213, 225, 1);
+            margin-left: 0.5rem;
+        }
+
+        .input-area {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.4));
+            backdrop-filter: blur(20px);
+            padding: 1.25rem;
+            border-radius: 0 0 1.5rem 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-top: none;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s;
+        }
+
+        .input-wrapper.focused {
+            transform: scale(1.05);
+        }
+
+        .input-field {
+            flex: 1;
+            background: rgba(71, 85, 105, 0.6);
+            border: 1px solid rgba(71, 85, 105, 1);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+
+        .input-field::placeholder {
+            color: rgba(148, 163, 184, 1);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 1);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
+        .input-field:disabled {
+            opacity: 0.5;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #2563eb, #9333ea);
+            color: white;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1.25rem;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .send-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .input-help {
+            font-size: 0.75rem;
+            color: rgba(100, 116, 139, 1);
+            text-align: center;
+        }
+
+        .sidebar {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar {
+                display: flex;
+            }
+        }
+
+        .sidebar-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.4));
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            padding: 1.25rem;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-card h3 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-card i {
+            font-size: 1.25rem;
+        }
+
+        .tip-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .tip-item {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: rgba(203, 213, 225, 1);
+        }
+
+        .tip-item i {
+            color: rgba(96, 165, 250, 1);
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        .suggested-queries {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .query-btn {
+            width: 100%;
+            text-align: left;
+            background: rgba(71, 85, 105, 0.4);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            color: rgba(203, 213, 225, 1);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .query-btn:hover {
+            background: rgba(71, 85, 105, 0.7);
+            color: white;
+            border-color: rgba(147, 51, 234, 0.3);
+        }
+
+        .query-btn-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .query-btn-arrow {
+            margin-left: auto;
             opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
+            transition: all 0.2s;
+        }
+
+        .query-btn:hover .query-btn-arrow {
             opacity: 1;
-            transform: translateY(0);
-          }
         }
 
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+        .footer {
+            margin-top: 2rem;
+            position: relative;
+            z-index: 10;
         }
 
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
+        .footer-content {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            align-items: center;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(59, 130, 246, 0.4);
-          border-radius: 3px;
+        @media (min-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr auto 1fr;
+            }
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(59, 130, 246, 0.6);
+        .footer-left {
+            text-align: center;
         }
-      `}</style>
+
+        @media (min-width: 768px) {
+            .footer-left {
+                text-align: left;
+            }
+        }
+
+        .footer-left p:first-child {
+            color: rgba(148, 163, 184, 1);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .footer-left p:last-child {
+            color: white;
+            font-weight: bold;
+            font-size: 1.125rem;
+            margin: 0;
+        }
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: rgba(148, 163, 184, 1);
+            font-size: 1.5rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: rgba(96, 165, 250, 1);
+            transform: scale(1.1);
+        }
+
+        .footer-right {
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .footer-right {
+                text-align: right;
+            }
+        }
+
+        .footer-right p {
+            color: rgba(148, 163, 184, 1);
+            font-size: 0.75rem;
+            margin: 0.25rem 0;
+        }
+
+        .blue-icon { color: rgba(96, 165, 250, 1); }
+        .purple-icon { color: rgba(168, 85, 247, 1); }
+        .yellow-icon { color: rgba(250, 204, 21, 1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="grid">
+            <div class="chat-box">
+                <div class="header">
+                    <div class="header-content">
+                        <div class="header-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="header-text">
+                            <h1>Shop Assistant</h1>
+                            <p><i class="fas fa-sparkles"></i>Your AI shopping companion</p>
+                        </div>
+                        <div class="header-badge">
+                            <i class="fas fa-bolt yellow-icon"></i>
+                            <span>Powered by Groq</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="messages-container" id="messagesContainer">
+                    <div class="message bot">
+                        <div class="message-bubble">
+                            <p class="message-text">Hey there! Welcome to Shop Assistant. I'm here to help you find amazing products, discover great deals, and answer any shopping questions. What are you looking for today?</p>
+                            <span class="message-time" id="time1">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <div class="input-wrapper" id="inputWrapper">
+                        <input type="text" id="messageInput" class="input-field" placeholder="Ask about products, deals, recommendations...">
+                        <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <p class="input-help">Press Enter to send</p>
+                </div>
+            </div>
+
+
+        </div>
     </div>
-  );
-}
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div class="footer-left">
+                    <p>Developed with love by</p>
+                    <p>Niloy Sannyal</p>
+                </div>
+
+                <div class="footer-links">
+                    <a href="mailto:Niloysannyal@gmail.com" title="Email">
+                      <img src="icons/email.png" alt="Email" width="30" height="30">
+                    </a>
+                    <a href="https://github.com/niloysannyal" target="_blank" rel="noopener noreferrer" title="GitHub">
+                      <img src="icons/github.png" alt="GitHub" width="30" height="30">
+                    </a>
+                    <a href="https://linkedin.com/in/niloysannyal" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                      <img src="icons/linkedin.png" alt="LinkedIn" width="30" height="30">
+                    </a>
+                </div>
+
+
+                <div class="footer-right">
+                    <p>© 2025 Shop Assistant</p>
+                    <p><i class="fas fa-bolt yellow-icon"></i> Powered by Groq LLM</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        var messageId = 2;
+        var isLoading = false;
+
+        var messagesContainer = document.getElementById('messagesContainer');
+        var messageInput = document.getElementById('messageInput');
+        var sendBtn = document.getElementById('sendBtn');
+        var inputWrapper = document.getElementById('inputWrapper');
+
+        function getTimeString() {
+            var now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addMessage(text, sender) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + sender;
+            messageDiv.innerHTML = '<div class="message-bubble"><p class="message-text">' + text + '</p><span class="message-time">' + getTimeString() + '</span></div>';
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addLoadingMessage() {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            messageDiv.id = 'loadingMessage';
+            messageDiv.innerHTML = '<div class="message-bubble"><div class="loading"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span class="loading-text">Shop Assistant is thinking...</span></div></div>';
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function removeLoadingMessage() {
+            var loadingMsg = document.getElementById('loadingMessage');
+            if (loadingMsg) {
+                loadingMsg.remove();
+            }
+        }
+
+        function sendMessage() {
+            var message = messageInput.value.trim();
+            if (!message || isLoading) return;
+
+            addMessage(message, 'user');
+            messageInput.value = '';
+            isLoading = true;
+            sendBtn.disabled = true;
+            addLoadingMessage();
+
+            fetch('http://localhost:8000/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(function(response) {
+                removeLoadingMessage();
+                if (!response.ok) throw new Error('Failed to get response');
+                return response.json();
+            })
+            .then(function(data) {
+                addMessage(data.response, 'bot');
+            })
+            .catch(function(error) {
+                removeLoadingMessage();
+                addMessage('Oops! Something went wrong. Please try again in a moment.', 'bot');
+                console.error('Error:', error);
+            })
+            .finally(function() {
+                isLoading = false;
+                sendBtn.disabled = false;
+                messageInput.focus();
+            });
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        messageInput.addEventListener('focus', function() {
+            inputWrapper.classList.add('focused');
+        });
+
+        messageInput.addEventListener('blur', function() {
+            inputWrapper.classList.remove('focused');
+        });
+
+        function fillQuery(btn) {
+            var query = btn.querySelector('span').textContent;
+            messageInput.value = query;
+            messageInput.focus();
+        }
+
+        document.getElementById('time1').textContent = getTimeString();
+    </script>
+</body>
+</html>
