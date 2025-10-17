@@ -1,7 +1,9 @@
 __pycache__/
 .env
 *.pyc
+temp_auto_push.bat
 *.pyo
-.vscode/
 .idea/
 .venv/
+.gitignore
+temp_interactive_push.bat
